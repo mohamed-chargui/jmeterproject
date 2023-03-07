@@ -1,0 +1,30 @@
+---
+- name: Install and configure JMeter
+  hosts: projectTarget
+  become: true
+  
+  tasks:
+    - name: Install Java
+      apt:
+        name: openjdk-8-jdk
+        state: present
+        
+    - name: Download and extract JMeter
+      get_url:
+        url: https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.1.tgz
+        dest: /tmp/jmeter.tgz
+        
+    - name: Extract JMeter
+      unarchive:
+        src: /tmp/jmeter.tgz
+        dest: /opt
+        remote_src: yes
+        copy: no
+        
+    - name: Set JMeter environment variables
+      lineinfile:
+        path: /etc/environment
+        line: 'JMETER_HOME=/opt/apache-jmeter-5.4.1'
+        
+    - name: Reload environment variables
+      shell: source /etc/environment
